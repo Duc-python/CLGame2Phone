@@ -1,0 +1,40 @@
+# Build outputs
+**/bin/
+**/obj/
+**/build/
+**/out/
+**/out2/
+**/.gradle/
+**/dex/
+**/out/com/
+
+# Logs
+logs/
+*.log
+
+# Tools (large, user-installed)
+tools/
+
+# IDE / OS
+.vs/
+.idea/
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+
+# Android
+android/local.properties
+android/.gradle/
+android/app/build/
+*.apk
+*.aab
+
+# TouchServer build intermediates
+touchserver/out/
+touchserver/dex/
+
+# Misc
+*.pdb
+*.deps.json
+*.runtimeconfig.json
