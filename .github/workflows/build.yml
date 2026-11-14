@@ -1,0 +1,73 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  touchserver:
+    name: Build TouchServer jar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK platform + build-tools
+        uses: android-actions/setup-android@v3
+      - name: Compile TouchServer
+        run: |
+          set -e
+          mkdir -p touchserver/out touchserver/dex
+          javac -cp "$ANDROID_HOME/platforms/android-34/android.jar" \
+            -d touchserver/out touchserver/src/com/clgame2phone/TouchServer.java
+          d8 --output touchserver/dex touchserver/out/com/clgame2phone/TouchServer.class
+          cd touchserver/dex && zip -r ../touchserver.jar classes.dex
+      - uses: actions/upload-artifact@v4
+        with:
+          name: touchserver-jar
+          path: touchserver/touchserver.jar
+
+  android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/gradle-build-action@v3
+      - name: Assemble debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+
+  agent:
+    name: Build PC agent
+    runs-on: windows-latest
+    needs: touchserver
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Download touchserver.jar
+        uses: actions/download-artifact@v4
+        with:
+          name: touchserver-jar
+          path: touchserver
+      - name: Build agent
+        run: dotnet build pc/CLGame2Phone.Agent/CLGame2Phone.Agent.csproj -c Release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agent-build
+          path: |
+            pc/CLGame2Phone.Agent/bin/Release/net10.0/CLGame2Phone.Agent.exe
+            pc/CLGame2Phone.Agent/bin/Release/net10.0/*.dll

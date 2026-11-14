@@ -9,8 +9,8 @@ namespace CLGame2Phone.Agent;
 internal static class Program
 {
     private const int Port = 27183;
-    private const int StreamWidth = 1280;
-    private const int StreamHeight = 576;
+    private const int StreamWidth = 1600;
+    private const int StreamHeight = 720;
     private const int StreamFps = 60;
 
     private static volatile bool _running = true;

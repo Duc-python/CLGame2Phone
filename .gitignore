@@ -33,6 +33,8 @@ android/app/build/
 # TouchServer build intermediates
 touchserver/out/
 touchserver/dex/
+# Built jars (rebuild via CI / README); keep out of git
+*.jar
 
 # Misc
 *.pdb

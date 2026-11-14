@@ -143,14 +143,18 @@ internal static class Adb
 
     private static string FindAdb()
     {
-        var candidates = new[]
+        var candidates = new List<string>();
+        var androidHome = Environment.GetEnvironmentVariable("ANDROID_HOME")
+            ?? Environment.GetEnvironmentVariable("ANDROID_SDK_ROOT");
+        if (!string.IsNullOrWhiteSpace(androidHome))
         {
-            @"C:\Android\Sdk\platform-tools\adb.exe",
-            System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                @"Microsoft\WinGet\Packages\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\platform-tools\adb.exe"),
-            "adb.exe"
-        };
+            candidates.Add(System.IO.Path.Combine(androidHome, "platform-tools", "adb.exe"));
+        }
+        candidates.Add(@"C:\Android\Sdk\platform-tools\adb.exe");
+        candidates.Add(System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            @"Microsoft\WinGet\Packages\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\platform-tools\adb.exe"));
+        candidates.Add("adb.exe");
 
         foreach (var candidate in candidates)
         {

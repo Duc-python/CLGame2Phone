@@ -46,7 +46,7 @@ public final class AudioPlayer {
                     SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT);
-            int bufferSize = Math.max(minBuffer, PACKET_BYTES * 2);
+            int bufferSize = Math.max(minBuffer, PACKET_BYTES);
 
             AudioAttributes attributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_GAME)
@@ -63,6 +63,7 @@ public final class AudioPlayer {
                     .setAudioFormat(format)
                     .setBufferSizeInBytes(bufferSize)
                     .setTransferMode(AudioTrack.MODE_STREAM)
+                    .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
                     .build();
             track.play();
             Log.d(TAG, "started, buffer=" + bufferSize);

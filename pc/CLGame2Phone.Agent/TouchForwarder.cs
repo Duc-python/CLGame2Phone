@@ -100,7 +100,6 @@ internal sealed class TouchForwarder : IDisposable
 
                 stream.Write(header);
                 stream.Write(payload);
-                stream.Flush();
             }
             catch
             {

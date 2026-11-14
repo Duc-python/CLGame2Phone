@@ -43,10 +43,11 @@ internal sealed class FfmpegCapture : IDisposable
         Arg("-f", "lavfi", "-i",
             $"ddagrab=output_idx=0:framerate=60:video_size={_rect.Width}x{_rect.Height}" +
             $":offset_x={_rect.X}:offset_y={_rect.Y}:draw_mouse=0");
-        Arg("-vf", "hwdownload,format=bgra,scale=1280:576:flags=fast_bilinear");
-        Arg("-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ull", "-rc", "cbr");
-        Arg("-b:v", "5M", "-maxrate", "5M", "-bufsize", "2500k");
-        Arg("-g", "30", "-bf", "0", "-zerolatency", "1");
+        Arg("-vf", "hwdownload,format=bgra,scale=1600:720:flags=bicubic");
+        Arg("-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ll", "-rc", "vbr");
+        Arg("-cq", "20", "-b:v", "0", "-maxrate", "30M", "-bufsize", "3M");
+        Arg("-g", "60", "-bf", "0", "-zerolatency", "1");
+        Arg("-rc-lookahead", "0", "-delay", "0");
         Arg("-pix_fmt", "yuv420p", "-f", "h264", "pipe:1");
 
         _process = new Process { StartInfo = psi };

@@ -130,7 +130,7 @@ public final class VideoClient {
         private final Socket socket;
         private final DataInputStream in;
         private final OutputStream out;
-        private final LinkedBlockingQueue<Nal> queue = new LinkedBlockingQueue<>(4);
+        private final LinkedBlockingQueue<Nal> queue = new LinkedBlockingQueue<>(1);
         private final LinkedBlockingQueue<Packet> inputQueue = new LinkedBlockingQueue<>(64);
         private final Object sendLock = new Object();
 
@@ -254,9 +254,9 @@ public final class VideoClient {
                         } else if (nalType == 1) {
                             if (codecReady && !waitingKey) {
                                 if (!queue.offer(new Nal(nal, pts))) {
-                                    queue.clear();
-                                    waitingKey = true;
-                                    dropped++;
+                                    // render-only-last-frame: drop oldest, keep newest
+                                    queue.poll();
+                                    queue.offer(new Nal(nal, pts));
                                 }
                             }
                         }
@@ -488,7 +488,10 @@ public final class VideoClient {
                     }
                 }
             } catch (InterruptedException ignored) {
-            } catch (IOException ignored) {
+            } catch (IOException ex) {
+                android.util.Log.e("CLGTouch", "sendLoop IOException", ex);
+            } catch (Exception ex) {
+                android.util.Log.e("CLGTouch", "sendLoop error", ex);
             }
         }
     }
